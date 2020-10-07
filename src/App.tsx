@@ -3,7 +3,7 @@ import './App.css';
 import PaiSho from "./components/Game";
 
 
-function App() {
+function App(): JSX.Element{
   return (
       <div className="App">
         <PaiSho></PaiSho>
