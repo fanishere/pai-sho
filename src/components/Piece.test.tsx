@@ -53,7 +53,7 @@ Konva.Stage.prototype.simulateMouseUp = function (pos) {
 describe('Test render', () => {
     let instance: App;
     class App extends React.Component {
-        stage: Stage | null | undefined;
+        stage: Konva.Stage | null | undefined;
         layer: Konva.Layer | null | undefined;
         piece: Piece | null | undefined;
 
@@ -64,8 +64,8 @@ describe('Test render', () => {
                         <Piece
                             gridWidth={20}
                             name={"test_piece"}
-                            onDragEnd={(p, position) => {}}
-                            onDragMove={(p, position) => {}}
+                            onDragEnd={(p) => {}}
+                            onDragMove={(p) => {}}
                             position={{x:1, y:0}}
                             ref={(node) => (this.piece = node)}
                         />
@@ -95,7 +95,7 @@ describe('Test render', () => {
 describe('Test getGuides', () => {
     let instance: App;
     class App extends React.Component {
-        stage: Stage | null | undefined;
+        stage: Konva.Stage | null | undefined;
         layer: Konva.Layer | null | undefined;
         piece: Piece | null | undefined;
 
@@ -106,8 +106,8 @@ describe('Test getGuides', () => {
                         <Piece
                             gridWidth={20}
                             name={"test_piece"}
-                            onDragEnd={(p, position) => {}}
-                            onDragMove={(p, position) => {}}
+                            onDragEnd={(p) => {}}
+                            onDragMove={(p) => {}}
                             position={{x:0, y:0}}
                             ref={(node) => (this.piece = node)}
                         />
@@ -188,7 +188,7 @@ describe("Test drag interactions", () => {
     let onDragMove = jest.fn();
     let onDragEnd = jest.fn();
     class App extends React.Component {
-        stage: Stage | null | undefined;
+        stage: Konva.Stage | null | undefined;
         layer: Konva.Layer | null | undefined;
         piece: Piece | null | undefined;
 
@@ -232,7 +232,7 @@ describe("Test drag interactions", () => {
         if (instance?.piece?.imageRef.current) {
             expect(instance.piece.imageRef.current.isDragging()).toEqual(true);
             expect(onDragMove).toHaveBeenCalledTimes(1);
-            expect(onDragMove).toHaveBeenCalledWith(instance.piece, {x: 20, y:30});
+            expect(onDragMove).toHaveBeenCalledWith(instance.piece);
 
             expect(onDragEnd).toHaveBeenCalledTimes(0);
         }
@@ -251,7 +251,7 @@ describe("Test drag interactions", () => {
 
             expect(instance.piece.imageRef.current.isDragging()).toEqual(false);
             expect(onDragEnd).toHaveBeenCalledTimes(1);
-            expect(onDragEnd).toHaveBeenCalledWith(instance.piece, {x: 20, y:20});
+            expect(onDragEnd).toHaveBeenCalledWith(instance.piece);
 
             expect(onDragMove).toHaveBeenCalledTimes(1);
         }

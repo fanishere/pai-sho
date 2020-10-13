@@ -113,7 +113,7 @@ export class Piece extends React.Component<PieceProps, PieceState> {
         }
     }
 
-    render(): React.ReactElement {
+    render(): React.ReactNode {
         const img = document.createElement('img');
         img.src = lily;
 

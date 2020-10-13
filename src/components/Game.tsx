@@ -82,7 +82,7 @@ class Game extends React.Component<GameProps, GameState> {
             Math.PI * 2,
             false);
     };
-    render(): React.ReactElement {
+    render(): React.ReactNode {
         const smallGridWidth = this.props.radius / (this.props.gridCount/2);
         const vertices: {x: number; y: number}[][] = Array(this.props.gridCount).fill("").map((_, i: number) => {
             return Array(this.props.gridCount).fill("").map((_, j) => {
@@ -253,7 +253,7 @@ class Gate extends React.Component<GateProps> {
     circleDistanceCalc = (start: number, radians: number): number => {
         return start + radians;
     }
-    render(): React.ReactElement {
+    render(): React.ReactNode {
         const rotation = this.props.rotation + 42.5;
         return (
             <Wedge
