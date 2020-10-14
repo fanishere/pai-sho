@@ -3,6 +3,14 @@ export type Position = {
     y: number;
 }
 
+export type PieceData = {
+    position: Position;
+}
+
+export interface PieceDataList {
+    [index: string]: PieceData;
+}
+
 export type PieceGuideCandidates = {
     position: Position;
     xDiff: number;

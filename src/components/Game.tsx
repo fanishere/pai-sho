@@ -1,8 +1,10 @@
 import React from "react";
-import {Circle, Group, Layer, Line, Rect, Stage, Wedge} from "react-konva";
+import {Circle, Group, Layer, Rect, Stage} from "react-konva";
 import {Piece} from "./Piece";
-import {PieceGuide, Position} from "./types";
+import {PieceDataList, PieceGuide, Position} from "./types";
 import Konva from "konva";
+import Gate from "./Gate";
+import Garden from "./Garden";
 
 type GameProps = {
     width: number;
@@ -13,14 +15,7 @@ type GameProps = {
 
 type GameState = {
     positionsVisible: PieceGuide[];
-    piecePositions: StringArray;
-}
-
-type PieceData = {
-    position: Position;
-}
-interface StringArray {
-    [index: string]: PieceData;
+    piecePositions: PieceDataList;
 }
 
 class Game extends React.Component<GameProps, GameState> {
@@ -106,169 +101,111 @@ class Game extends React.Component<GameProps, GameState> {
         });
 
         return (
-            <Layer
-                offsetX={-this.props.radius}
-                offsetY={-this.props.radius}
-                ref={this.layerRef}
-            >
-                <Group
-                    clipFunc={this.clipFunc}
-                >
-
-                    <Circle
-                        x={0}
-                        y={0}
-                        radius={this.props.radius}
-                        fill="pink"
-                    ></Circle>
-
-                    {/*grids*/}
-                    {vertices.map((vertex, i) => {
-                        return vertex.map((v, j) => {
-                            return <Rect
-                                // TODO make this key unique
-                                key={i + j}
-                                x={v.x}
-                                y={v.y}
-                                width={smallGridWidth}
-                                height={smallGridWidth}
-                                stroke="white"
-                            />
-                        })
-                    })}
-
-                    {/*guides*/}
-                    {vertices.map((vertex, i) => {
-                        return vertex.map((v, j) => {
-                            return <Circle
-                                visible={this.isVisible({x:v.x, y:v.y})}
-                                // TODO make this key unique
-                                key={i+j}
-                                x={v.x}
-                                y={v.y}
-                                stroke="white"
-                                fill={"red"}
-                                radius={5}
-                            />
-                        })
-                    })}
-                    <Gate
-                        x={(smallGridWidth * 2) - this.props.radius}
-                        y={0}
-                        gridWidth={smallGridWidth}
-                        gameRadius={this.props.width}
-                        rotation={90}
-                    ></Gate>
-                    <Gate
-                        x={0}
-                        y={this.props.radius - (smallGridWidth * 2)}
-                        gridWidth={smallGridWidth}
-                        gameRadius={this.props.width}
-                        rotation={0}
-                    ></Gate>
-                    <Gate
-                        x={0}
-                        y={(smallGridWidth * 2) - this.props.radius}
-                        gridWidth={smallGridWidth}
-                        gameRadius={this.props.width}
-                        rotation={180}
-                    ></Gate>
-                    <Gate
-                        x={this.props.radius - (smallGridWidth * 2)}
-                        y={0}
-                        gridWidth={smallGridWidth}
-                        gameRadius={this.props.width}
-                        rotation={270}
-                    ></Gate>
-                    <Garden
-                        middle={[0, 0]}
-                        vertex1={[(smallGridWidth * 2) - this.props.radius, 0]}
-                        vertex2={[0, (smallGridWidth * 2) - this.props.radius]}
-                        fill={"#fef3ed"}
-                    ></Garden>
-                    <Garden
-                        middle={[0, 0]}
-                        vertex1={[this.props.radius - (smallGridWidth * 2), 0]}
-                        vertex2={[0, (smallGridWidth * 2) - this.props.radius]}
-                        fill={"red"}
-                    ></Garden>
-                    <Garden
-                        middle={[0, 0]}
-                        vertex1={[this.props.radius - (smallGridWidth * 2), 0]}
-                        vertex2={[0, this.props.radius - (smallGridWidth * 2)]}
-                        fill={"#fef3ed"}
-                    ></Garden>
-                    <Garden
-                        middle={[0, 0]}
-                        vertex1={[(smallGridWidth * 2) - this.props.radius, 0]}
-                        vertex2={[0, this.props.radius - (smallGridWidth * 2)]}
-                        fill={"red"}
-                    ></Garden>
-                    {pieces}
-                </Group>
-            </Layer>
-        );
-    }
-}
-
-class PaiSho extends React.Component {
-    render(): React.ReactNode {
-        return (
             <Stage width={window.innerWidth} height={window.innerHeight}>
-                <Game height={300} width={300} radius={300} gridCount={18}></Game>
+                <Layer
+                    offsetX={-this.props.radius}
+                    offsetY={-this.props.radius}
+                    ref={this.layerRef}
+                >
+                    <Group
+                        clipFunc={this.clipFunc}
+                    >
+
+                        <Circle
+                            x={0}
+                            y={0}
+                            radius={this.props.radius}
+                            fill="pink"
+                        ></Circle>
+
+                        {/*grids*/}
+                        {vertices.map((vertex, i) => {
+                            return vertex.map((v, j) => {
+                                return <Rect
+                                    // TODO make this key unique
+                                    key={i + j}
+                                    x={v.x}
+                                    y={v.y}
+                                    width={smallGridWidth}
+                                    height={smallGridWidth}
+                                    stroke="white"
+                                />
+                            })
+                        })}
+
+                        {/*guides*/}
+                        {vertices.map((vertex, i) => {
+                            return vertex.map((v, j) => {
+                                return <Circle
+                                    visible={this.isVisible({x:v.x, y:v.y})}
+                                    // TODO make this key unique
+                                    key={i+j}
+                                    x={v.x}
+                                    y={v.y}
+                                    stroke="white"
+                                    fill={"red"}
+                                    radius={5}
+                                />
+                            })
+                        })}
+                        <Gate
+                            x={(smallGridWidth * 2) - this.props.radius}
+                            y={0}
+                            gridWidth={smallGridWidth}
+                            gameRadius={this.props.width}
+                            rotation={90}
+                        ></Gate>
+                        <Gate
+                            x={0}
+                            y={this.props.radius - (smallGridWidth * 2)}
+                            gridWidth={smallGridWidth}
+                            gameRadius={this.props.width}
+                            rotation={0}
+                        ></Gate>
+                        <Gate
+                            x={0}
+                            y={(smallGridWidth * 2) - this.props.radius}
+                            gridWidth={smallGridWidth}
+                            gameRadius={this.props.width}
+                            rotation={180}
+                        ></Gate>
+                        <Gate
+                            x={this.props.radius - (smallGridWidth * 2)}
+                            y={0}
+                            gridWidth={smallGridWidth}
+                            gameRadius={this.props.width}
+                            rotation={270}
+                        ></Gate>
+                        <Garden
+                            middle={[0, 0]}
+                            vertex1={[(smallGridWidth * 2) - this.props.radius, 0]}
+                            vertex2={[0, (smallGridWidth * 2) - this.props.radius]}
+                            fill={"#fef3ed"}
+                        ></Garden>
+                        <Garden
+                            middle={[0, 0]}
+                            vertex1={[this.props.radius - (smallGridWidth * 2), 0]}
+                            vertex2={[0, (smallGridWidth * 2) - this.props.radius]}
+                            fill={"red"}
+                        ></Garden>
+                        <Garden
+                            middle={[0, 0]}
+                            vertex1={[this.props.radius - (smallGridWidth * 2), 0]}
+                            vertex2={[0, this.props.radius - (smallGridWidth * 2)]}
+                            fill={"#fef3ed"}
+                        ></Garden>
+                        <Garden
+                            middle={[0, 0]}
+                            vertex1={[(smallGridWidth * 2) - this.props.radius, 0]}
+                            vertex2={[0, this.props.radius - (smallGridWidth * 2)]}
+                            fill={"red"}
+                        ></Garden>
+                        {pieces}
+                    </Group>
+                </Layer>
             </Stage>
         );
     }
 }
 
-type GardenProps = {
-    middle: Array<number>;
-    vertex1: Array<number>;
-    vertex2: Array<number>;
-    fill: string;
-}
-
-function Garden(props: GardenProps): React.ReactElement {
-    return (
-        <Line
-            points={[props.middle[0], props.middle[1],
-                props.vertex1[0], props.vertex1[1],
-                props.vertex2[0], props.vertex2[1]]}
-            fill={props.fill}
-            opacity={.5}
-            closed={true}
-        ></Line>
-    );
-}
-
-type GateProps = {
-    x: number;
-    y: number;
-    gameRadius: number;
-    gridWidth: number;
-    rotation: number;
-}
-
-class Gate extends React.Component<GateProps> {
-    circleDistanceCalc = (start: number, radians: number): number => {
-        return start + radians;
-    }
-    render(): React.ReactNode {
-        const rotation = this.props.rotation + 42.5;
-        return (
-            <Wedge
-                x={this.props.x}
-                y={this.props.y}
-                // TODO make numbers not hard coded
-                angle={96}
-                radius={95}
-                fill={"red"}
-                rotation={rotation}
-                opacity={.5}
-            >
-            </Wedge>
-        );
-    }
-}
-
-export default PaiSho;
+export default Game;

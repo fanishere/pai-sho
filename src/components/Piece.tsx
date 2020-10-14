@@ -3,7 +3,7 @@ import lily from "../assets/Lily_final.svg";
 import {Image} from "react-konva";
 import {debounce} from "underscore";
 import Konva from "konva";
-import {PieceGuide, PieceGuideCandidates, Position} from "./types";
+import {PieceGuide, PieceGuideCandidates, Position, PieceData} from "./types";
 
 
 type PieceProps = {
@@ -14,11 +14,7 @@ type PieceProps = {
     onDragEnd: (p: Piece) => void;
 }
 
-type PieceState = {
-    position: Position;
-}
-
-export class Piece extends React.Component<PieceProps, PieceState> {
+export class Piece extends React.Component<PieceProps, PieceData> {
     readonly imageRef: React.RefObject<Konva.Image>;
     constructor(props: PieceProps) {
         super(props);
