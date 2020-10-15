@@ -106,7 +106,8 @@
       "!src/**/*.d.ts"
     ],
     "setupFiles": [
-      "react-app-polyfill/jsdom"
+      "react-app-polyfill/jsdom",
+      "jest-canvas-mock"
     ],
     "setupFilesAfterEnv": [
       "<rootDir>/src/setupTests.js"

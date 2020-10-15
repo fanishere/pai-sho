@@ -69,13 +69,13 @@ class Game extends React.Component<GameProps, GameState> {
         return Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) >= this.props.radius*this.props.radius;
     }
     clipFunc = (ctx: CanvasRenderingContext2D): void => {
+        // clip a full circle of this.props.radius
         ctx.arc(
             0,
             0,
             this.props.radius,
             0,
-            Math.PI * 2,
-            false);
+            Math.PI * 2);
     };
     render(): React.ReactNode {
         const smallGridWidth = this.props.radius / (this.props.gridCount/2);
