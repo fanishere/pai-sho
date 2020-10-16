@@ -14,7 +14,7 @@ type GameProps = {
 }
 
 type GameState = {
-    positionsVisible: PieceGuide[];
+    guidesVisible: PieceGuide[];
     piecePositions: PieceDataList;
 }
 
@@ -29,14 +29,14 @@ class Game extends React.Component<GameProps, GameState> {
         this.handlePieceMoving = this.handlePieceMoving.bind(this);
         this.handlePieceMoved = this.handlePieceMoved.bind(this);
         this.state = {
-            positionsVisible: [],
+            guidesVisible: [],
             piecePositions: {
                 "first": {position: {x:0, y:0}}
             }
         };
     }
     isVisible = (pos: Position): boolean => {
-        const p = this.state.positionsVisible.find((guide) => {
+        const p = this.state.guidesVisible.find((guide) => {
             return (Math.abs(guide.position.x - pos.x) < 30) && (Math.abs(guide.position.y - pos.y) < 30);
         })
 
@@ -46,15 +46,18 @@ class Game extends React.Component<GameProps, GameState> {
         // get guide positions that apply to this piece [will use original piece position]
         const guides = piece.getGuides();
         this.setState({
-            positionsVisible: guides
+            guidesVisible: guides
         })
     }
     handlePieceMoved = (piece: Piece): void => {
-        if (this.state.positionsVisible.length < 1) {
+        const guides = piece.getGuides();
+        if (guides.length < 1) {
             return
         }
-        const guide = this.state.positionsVisible[0];
+
+        const guide = guides[0];
         let snapPosition = guide.position;
+        // offset is too large so snap to original position
         if (guide.offset > 15) {
             snapPosition = {x:0, y:0}
         }
@@ -62,7 +65,7 @@ class Game extends React.Component<GameProps, GameState> {
         piecePositions[piece.props.name] = {position: snapPosition}
         this.setState({
             piecePositions: piecePositions,
-            positionsVisible: []
+            guidesVisible: []
         });
     }
     isInsideGameBoard = (x1: number, x2: number, y1: number, y2: number,): boolean => {
