@@ -1,27 +1,22 @@
 import React from "react";
-import {KonvaEventObject} from "konva/types/Node";
 import lily from "../assets/Lily_final.svg";
 import {Image} from "react-konva";
 import {debounce} from "underscore";
 import Konva from "konva";
-import {PieceGuide, PieceGuideCandidates, Position} from "./types";
+import {PieceGuide, PieceGuideCandidates, Position, PieceData} from "./types";
 
 
 type PieceProps = {
-    position: Position
-    name: string
-    gridWidth: number
-    onDragMove: (p: Piece, position: Position) => void
-    onDragEnd: (p: Piece, position: Position) => void
+    position: Position;
+    name: string;
+    gridWidth: number;
+    onDragMove: (p: Piece) => void;
+    onDragEnd: (p: Piece) => void;
 }
 
-type PieceState = {
-    position: Position
-}
-
-export class Piece extends React.Component<PieceProps, PieceState> {
+export class Piece extends React.Component<PieceProps, PieceData> {
     readonly imageRef: React.RefObject<Konva.Image>;
-    constructor(props: any) {
+    constructor(props: PieceProps) {
         super(props);
 
         this.imageRef = React.createRef();
@@ -35,21 +30,21 @@ export class Piece extends React.Component<PieceProps, PieceState> {
         };
     }
 
-    // TODO name the positions
+    // TODO name the positions ex: top left 0
     getSnapLines = (): Position[] => {
-        let lines: Position[] = []
-        let vertical = [
+        const lines: Position[] = []
+        const vertical = [
             this.props.position.x - this.props.gridWidth,
             this.props.position.x,
             this.props.position.x + this.props.gridWidth,
         ];
-        let horizontal = [
+        const horizontal = [
             this.props.position.y - this.props.gridWidth,
             this.props.position.y,
             this.props.position.y + this.props.gridWidth,
         ];
-        vertical.map((v, i) => {
-            horizontal.map((h, j) => {
+        vertical.map((v) => {
+            horizontal.map((h) => {
                 lines.push({
                     x: v,
                     y: h,
@@ -61,16 +56,16 @@ export class Piece extends React.Component<PieceProps, PieceState> {
     }
 
     getGuides = (): PieceGuide[] => {
-        var GUIDELINE_OFFSET = 100;
-        let candidates: PieceGuideCandidates[] = [];
-        let offset = 15;
+        const GUIDELINE_OFFSET = 100;
+        const candidates: PieceGuideCandidates[] = [];
+        const offset = 15;
 
-        let snapPositions = this.getSnapLines();
+        const snapPositions = this.getSnapLines();
         snapPositions.forEach((pos) => {
             if (this.imageRef.current) {
-                let currentPosition = this.imageRef.current.getPosition()
-                let xDiff = Math.abs(pos.x - currentPosition.x);
-                let yDiff = Math.abs(pos.y - currentPosition.y);
+                const currentPosition = this.imageRef.current.getPosition()
+                const xDiff = Math.abs(pos.x - currentPosition.x);
+                const yDiff = Math.abs(pos.y - currentPosition.y);
 
                 // if the distance between guild line and
                 // object snap point is close we can consider this for snapping
@@ -79,13 +74,13 @@ export class Piece extends React.Component<PieceProps, PieceState> {
                         position: pos,
                         xDiff: xDiff,
                         yDiff: yDiff,
-                        offset: 15,
+                        offset: offset,
                     });
                 }
             }
         })
 
-        let guides: PieceGuide[] = [];
+        const guides: PieceGuide[] = [];
 
         // sort guides
         candidates.sort(
@@ -103,28 +98,19 @@ export class Piece extends React.Component<PieceProps, PieceState> {
 
         return guides;
     }
-    handleChange(e: KonvaEventObject<DragEvent>) {
-        this.props.onDragMove(
-            this,
-            {
-                x: e.target.attrs.x,
-                y: e.target.attrs.y
-            });
+    handleChange = (): void => {
+        this.props.onDragMove(this);
     }
-    handleMove = (e: KonvaEventObject<DragEvent>) => {
-        this.props.onDragEnd(this,
-            {
-                x: e.target.attrs.x,
-                y: e.target.attrs.y
-            });
+    handleMove = (): void => {
+        this.props.onDragEnd(this);
 
         if (this.imageRef.current) {
             this.imageRef.current.setPosition(this.props.position);
         }
     }
 
-    render() {
-        let img = document.createElement('img');
+    render(): React.ReactNode {
+        const img = document.createElement('img');
         img.src = lily;
 
         return (
