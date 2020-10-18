@@ -76,8 +76,9 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
-    "lint": "eslint . --ext .ts",
-    "lint-and-fix": "eslint . --ext .ts --fix"
+    "lint": "eslint '*/**/*.{ts,tsx}'",
+    "lint-and-fix": "eslint '*/**/*.{ts,tsx}' --fix",
+    "fmt": "prettier --config .prettierrc 'src/**/*.{ts,tsx}' --write"
   },
   "browserslist": {
     "production": [
@@ -95,7 +96,10 @@
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.4",
     "enzyme-to-json": "^3.5.0",
-    "jest-enzyme": "^7.1.2"
+    "eslint-config-prettier": "^6.13.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "jest-enzyme": "^7.1.2",
+    "prettier": "^2.1.2"
   },
   "jest": {
     "roots": [

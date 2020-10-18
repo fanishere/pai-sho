@@ -1,24 +1,24 @@
 export type Position = {
-    x: number;
-    y: number;
-}
+  x: number;
+  y: number;
+};
 
 export type PieceData = {
-    position: Position;
-}
+  position: Position;
+};
 
 export interface PieceDataList {
-    [index: string]: PieceData;
+  [index: string]: PieceData;
 }
 
 export type PieceGuideCandidates = {
-    position: Position;
-    xDiff: number;
-    yDiff: number;
-    offset: number;
-}
+  position: Position;
+  xDiff: number;
+  yDiff: number;
+  offset: number;
+};
 
 export type PieceGuide = {
-    position: Position;
-    offset: number;
-}
+  position: Position;
+  offset: number;
+};
