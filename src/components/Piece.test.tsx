@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as React from 'react';
 import { Piece } from './Piece';
 import { Layer, Stage } from 'react-konva';
-import { mount, shallow, render, ShallowWrapper } from 'enzyme';
+import { mount, shallow } from 'enzyme';
 import Konva from 'konva';
 import { Position } from './types';
 
@@ -13,8 +14,8 @@ declare module 'konva/types/Stage' {
   }
 }
 
-Konva.Stage.prototype.simulateMouseDown = function (pos: Position) {
-  let top = this.content.getBoundingClientRect().top;
+Konva.Stage.prototype.simulateMouseDown = function (pos: Position): void {
+  const top = this.content.getBoundingClientRect().top;
 
   this._mousedown({
     clientX: pos.x,
@@ -23,10 +24,10 @@ Konva.Stage.prototype.simulateMouseDown = function (pos: Position) {
   });
 };
 
-Konva.Stage.prototype.simulateMouseMove = function (pos) {
-  let top = this.content.getBoundingClientRect().top;
+Konva.Stage.prototype.simulateMouseMove = function (pos: Position): void {
+  const top = this.content.getBoundingClientRect().top;
 
-  let evt = {
+  const evt = {
     clientX: pos.x,
     clientY: pos.y + top,
     button: 2
@@ -36,10 +37,10 @@ Konva.Stage.prototype.simulateMouseMove = function (pos) {
   Konva.DD._drag(evt);
 };
 
-Konva.Stage.prototype.simulateMouseUp = function (pos) {
-  let top = this.content.getBoundingClientRect().top;
+Konva.Stage.prototype.simulateMouseUp = function (pos: Position): void {
+  const top = this.content.getBoundingClientRect().top;
 
-  let evt = {
+  const evt = {
     clientX: pos.x,
     clientY: pos.y + top,
     button: 2
@@ -57,17 +58,17 @@ describe('Test render', () => {
     layer: Konva.Layer | null | undefined;
     piece: Piece | null | undefined;
 
-    render() {
+    render(): React.ReactNode {
       return (
-        <Stage ref={(node) => (this.stage = node)}>
-          <Layer ref={(node) => (this.layer = node)}>
+        <Stage ref={(node): Konva.Stage | null => (this.stage = node)}>
+          <Layer ref={(node): Konva.Layer | null => (this.layer = node)}>
             <Piece
               gridWidth={20}
               name={'test_piece'}
-              onDragEnd={(p) => {}}
-              onDragMove={(p) => {}}
+              onDragEnd={jest.fn()}
+              onDragMove={jest.fn()}
               position={{ x: 1, y: 0 }}
-              ref={(node) => (this.piece = node)}
+              ref={(node): Piece | null => (this.piece = node)}
             />
           </Layer>
         </Stage>
@@ -99,17 +100,17 @@ describe('Test getGuides', () => {
     layer: Konva.Layer | null | undefined;
     piece: Piece | null | undefined;
 
-    render() {
+    render(): React.ReactNode {
       return (
-        <Stage ref={(node) => (this.stage = node)}>
-          <Layer ref={(node) => (this.layer = node)}>
+        <Stage ref={(node): Konva.Stage | null => (this.stage = node)}>
+          <Layer ref={(node): Konva.Layer | null => (this.layer = node)}>
             <Piece
               gridWidth={20}
               name={'test_piece'}
-              onDragEnd={(p) => {}}
-              onDragMove={(p) => {}}
+              onDragEnd={jest.fn()}
+              onDragMove={jest.fn()}
               position={{ x: 0, y: 0 }}
-              ref={(node) => (this.piece = node)}
+              ref={(node): Piece | null => (this.piece = node)}
             />
           </Layer>
         </Stage>
@@ -123,8 +124,8 @@ describe('Test getGuides', () => {
   });
 
   it('getSnapLines gets box of 9 positions', () => {
-    let snapLines = instance.piece?.getSnapLines();
-    let expectedSnapLines = [
+    const snapLines = instance.piece?.getSnapLines();
+    const expectedSnapLines = [
       { x: -20, y: -20 },
       { x: -20, y: 0 },
       { x: -20, y: 20 },
@@ -139,8 +140,8 @@ describe('Test getGuides', () => {
   });
 
   it('getGuides gets box of 9 positions sorted with offsets', () => {
-    let guides = instance.piece?.getGuides();
-    let expectedSnapLines = [
+    const guides = instance.piece?.getGuides();
+    const expectedSnapLines = [
       {
         position: { x: 0, y: 0 },
         offset: 0
@@ -192,17 +193,21 @@ describe('Test drag interactions', () => {
     layer: Konva.Layer | null | undefined;
     piece: Piece | null | undefined;
 
-    render() {
+    render(): React.ReactNode {
       return (
-        <Stage ref={(node) => (this.stage = node)} width={300} height={300}>
-          <Layer ref={(node) => (this.layer = node)}>
+        <Stage
+          ref={(node): Konva.Stage | null => (this.stage = node)}
+          width={300}
+          height={300}
+        >
+          <Layer ref={(node): Konva.Layer | null => (this.layer = node)}>
             <Piece
               gridWidth={20}
               name={'test_piece'}
               onDragEnd={onDragEnd}
               onDragMove={onDragMove}
               position={{ x: 0, y: 0 }}
-              ref={(node) => (this.piece = node)}
+              ref={(node): Piece | null => (this.piece = node)}
             />
           </Layer>
         </Stage>
@@ -255,11 +260,9 @@ describe('Test drag interactions', () => {
 });
 
 describe('Test onDragEnd updates position', () => {
-  let wrapper: ShallowWrapper<any, any, Piece>;
-
   const onDragMove = jest.fn();
   const onDragEnd = jest.fn();
-  let piece = (
+  const wrapper = shallow(
     <Piece
       gridWidth={20}
       name={'test_piece'}
@@ -269,14 +272,10 @@ describe('Test onDragEnd updates position', () => {
     />
   );
 
-  beforeEach(() => {
-    wrapper = shallow<Piece>(piece);
-  });
-
   it('onDragEnd updates image position', () => {
     wrapper.setState({ position: { x: 20, y: 20 } });
     wrapper.simulate('dragEnd', { target: { attrs: { x: 20, y: 20 } } });
-    let pieceProps = wrapper.props();
+    const pieceProps = wrapper.props();
 
     // assert image position
     expect(pieceProps.x).toEqual(20);

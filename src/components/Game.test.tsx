@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as React from 'react';
 import { mount, ReactWrapper, shallow, ShallowWrapper } from 'enzyme';
 import Game from './Game';
@@ -12,15 +13,15 @@ describe('Mounted tests', () => {
   class App extends React.Component {
     game: Game | null | undefined;
 
-    render() {
+    render(): React.ReactNode {
       return (
         <Game
           height={300}
           width={300}
           radius={300}
           gridCount={18}
-          ref={(node) => (this.game = node)}
-        ></Game>
+          ref={(node): Game | null => (this.game = node)}
+        />
       );
     }
   }
@@ -91,7 +92,7 @@ describe('Shallow tests', () => {
     );
     game = wrapper.instance() as Game;
 
-    let pieceWrapper = shallow(
+    const pieceWrapper = shallow(
       <Piece
         key={0}
         name={'test piece'}
@@ -106,13 +107,13 @@ describe('Shallow tests', () => {
 
   describe('Test handlePieceMoving', () => {
     it('0 guides returned', () => {
-      let guides: PieceGuide[] = [];
+      const guides: PieceGuide[] = [];
       piece.getGuides = jest.fn().mockReturnValue(guides);
       game.handlePieceMoving(piece);
       expect(game?.state.guidesVisible).toEqual(guides);
     });
     it('one guide returned', () => {
-      let guides = [
+      const guides = [
         {
           position: { x: 0, y: 0 },
           offset: 10
@@ -123,7 +124,7 @@ describe('Shallow tests', () => {
       expect(game?.state.guidesVisible).toEqual(guides);
     });
     it('three guides returned', () => {
-      let guides = [
+      const guides = [
         {
           position: { x: 0, y: 0 },
           offset: 10
@@ -145,7 +146,7 @@ describe('Shallow tests', () => {
 
   describe('Test handlePieceMoved', () => {
     it('0 guides returned', () => {
-      let guides: PieceGuide[] = [];
+      const guides: PieceGuide[] = [];
       piece.getGuides = jest.fn().mockReturnValue(guides);
       expect(() => game.handlePieceMoved(piece)).not.toThrow();
       expect(game.state.guidesVisible).toEqual([]);
@@ -154,7 +155,7 @@ describe('Shallow tests', () => {
       });
     });
     it('one guide returned', () => {
-      let guides: PieceGuide[] = [
+      const guides: PieceGuide[] = [
         {
           position: { x: 20, y: 20 },
           offset: 10
@@ -169,7 +170,7 @@ describe('Shallow tests', () => {
       });
     });
     it('three guide returned', () => {
-      let guides: PieceGuide[] = [
+      const guides: PieceGuide[] = [
         {
           position: { x: 20, y: 20 },
           offset: 10

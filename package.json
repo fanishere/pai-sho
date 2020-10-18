@@ -76,8 +76,8 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
-    "lint": "eslint '*/**/*.ts'",
-    "lint-and-fix": "eslint '*/**/*.ts' --fix",
+    "lint": "eslint '*/**/*.{ts,tsx}'",
+    "lint-and-fix": "eslint '*/**/*.{ts,tsx}' --fix",
     "fmt": "prettier --config .prettierrc 'src/**/*.{ts,tsx}' --write"
   },
   "browserslist": {
