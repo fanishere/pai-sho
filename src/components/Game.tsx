@@ -1,7 +1,7 @@
 import React from "react";
 import {Circle, Group, Layer, Rect, Stage} from "react-konva";
 import {Piece} from "./Piece";
-import {PieceDataList, PieceGuide, Position} from "./types";
+import {PieceDataList, PieceGuide} from "./types";
 import Konva from "konva";
 import Gate from "./Gate";
 import Garden from "./Garden";
@@ -34,13 +34,6 @@ class Game extends React.Component<GameProps, GameState> {
                 "first": {position: {x:0, y:0}}
             }
         };
-    }
-    isVisible = (pos: Position): boolean => {
-        const p = this.state.guidesVisible.find((guide) => {
-            return (Math.abs(guide.position.x - pos.x) < 30) && (Math.abs(guide.position.y - pos.y) < 30);
-        })
-
-        return p !== undefined;
     }
     handlePieceMoving(piece: Piece): void {
         // get guide positions that apply to this piece [will use original piece position]
@@ -137,20 +130,18 @@ class Game extends React.Component<GameProps, GameState> {
                         })}
 
                         {/*guides*/}
-                        {vertices.map((vertex, i) => {
-                            return vertex.map((v, j) => {
-                                return <Circle
-                                    visible={this.isVisible({x:v.x, y:v.y})}
-                                    // TODO make this key unique
-                                    key={i+j}
-                                    x={v.x}
-                                    y={v.y}
-                                    stroke="white"
-                                    fill={"red"}
-                                    radius={5}
-                                />
-                            })
+                        {this.state.guidesVisible.map((guide, i) => {
+                            return <Circle
+                                // TODO make this key unique
+                                key={i}
+                                x={guide.position.x}
+                                y={guide.position.y}
+                                stroke="white"
+                                fill={"red"}
+                                radius={5}
+                            />
                         })}
+
                         <Gate
                             x={(smallGridWidth * 2) - this.props.radius}
                             y={0}

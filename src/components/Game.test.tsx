@@ -196,5 +196,3 @@ describe('Shallow tests', () => {
         });
     });
 });
-
-// TODO: test isVisible
