@@ -15,7 +15,6 @@ export type PieceGuideCandidates = {
   position: Position;
   xDiff: number;
   yDiff: number;
-  offset: number;
 };
 
 export type PieceGuide = {

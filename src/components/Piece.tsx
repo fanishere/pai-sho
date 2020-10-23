@@ -5,17 +5,23 @@ import { debounce } from 'underscore';
 import Konva from 'konva';
 import { PieceGuide, PieceGuideCandidates, Position, PieceData } from './types';
 
-type PieceProps = {
+export interface PieceProps {
   position: Position;
   name: string;
   gridWidth: number;
-  onDragMove: (p: Piece) => void;
-  onDragEnd: (p: Piece) => void;
-};
+  onDragMove: (p: Piece<PieceProps>) => void;
+  onDragEnd: (p: Piece<PieceProps>) => void;
+}
 
-export class Piece extends React.Component<PieceProps, PieceData> {
+interface PieceInt {
+  getSnapLines: () => Position[];
+}
+
+export class Piece<T extends PieceProps>
+  extends React.Component<T, PieceData>
+  implements PieceInt {
   readonly imageRef: React.RefObject<Konva.Image>;
-  constructor(props: PieceProps) {
+  constructor(props: T) {
     super(props);
 
     this.imageRef = React.createRef();
@@ -25,36 +31,13 @@ export class Piece extends React.Component<PieceProps, PieceData> {
       position: this.props.position
     };
   }
-
-  // TODO name the positions ex: top left 0
+  
   getSnapLines = (): Position[] => {
-    const lines: Position[] = [];
-    const vertical = [
-      this.props.position.x - this.props.gridWidth,
-      this.props.position.x,
-      this.props.position.x + this.props.gridWidth
-    ];
-    const horizontal = [
-      this.props.position.y - this.props.gridWidth,
-      this.props.position.y,
-      this.props.position.y + this.props.gridWidth
-    ];
-    vertical.map((v) => {
-      horizontal.map((h) => {
-        lines.push({
-          x: v,
-          y: h
-        });
-      });
-    });
-
-    return lines;
+    throw new Error('You forgot to override me!');
   };
 
   getGuides = (): PieceGuide[] => {
-    const GUIDELINE_OFFSET = 100;
     const candidates: PieceGuideCandidates[] = [];
-    const offset = 15;
 
     const snapPositions = this.getSnapLines();
     snapPositions.forEach((pos) => {
@@ -63,16 +46,11 @@ export class Piece extends React.Component<PieceProps, PieceData> {
         const xDiff = Math.abs(pos.x - currentPosition.x);
         const yDiff = Math.abs(pos.y - currentPosition.y);
 
-        // if the distance between guild line and
-        // object snap point is close we can consider this for snapping
-        if (xDiff < GUIDELINE_OFFSET && yDiff < GUIDELINE_OFFSET) {
-          candidates.push({
-            position: pos,
-            xDiff: xDiff,
-            yDiff: yDiff,
-            offset: offset
-          });
-        }
+        candidates.push({
+          position: pos,
+          xDiff: xDiff,
+          yDiff: yDiff
+        });
       }
     });
 

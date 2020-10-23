@@ -1,10 +1,11 @@
 import React from 'react';
 import { Circle, Group, Layer, Rect, Stage } from 'react-konva';
-import { Piece } from './Piece';
+import { Piece, PieceProps } from './Piece';
 import { PieceDataList, PieceGuide } from './types';
 import Konva from 'konva';
 import Gate from './Gate';
 import Garden from './Garden';
+import { FlowerPiece } from './ThreeSpaceFlower';
 
 type GameProps = {
   width: number;
@@ -20,12 +21,10 @@ type GameState = {
 
 class Game extends React.Component<GameProps, GameState> {
   private layerRef: React.RefObject<Konva.Layer> | null | undefined;
-  private pieceRef: React.RefObject<Piece>;
   constructor(props: GameProps) {
     super(props);
 
     this.layerRef = React.createRef();
-    this.pieceRef = React.createRef();
     this.handlePieceMoving = this.handlePieceMoving.bind(this);
     this.handlePieceMoved = this.handlePieceMoved.bind(this);
     this.state = {
@@ -35,14 +34,14 @@ class Game extends React.Component<GameProps, GameState> {
       }
     };
   }
-  handlePieceMoving(piece: Piece): void {
+  handlePieceMoving(piece: Piece<PieceProps>): void {
     // get guide positions that apply to this piece [will use original piece position]
     const guides = piece.getGuides();
     this.setState({
       guidesVisible: guides
     });
   }
-  handlePieceMoved = (piece: Piece): void => {
+  handlePieceMoved = (piece: Piece<PieceProps>): void => {
     const guides = piece.getGuides();
     if (guides.length < 1) {
       return;
@@ -93,15 +92,15 @@ class Game extends React.Component<GameProps, GameState> {
     const pieces = Object.keys(this.state.piecePositions).map((key) => {
       const p = this.state.piecePositions[key];
       return (
-        <Piece
-          ref={this.pieceRef}
+        <FlowerPiece
+          spaces={3}
           key={key}
           name={key}
           position={p.position}
           onDragMove={this.handlePieceMoving}
           onDragEnd={this.handlePieceMoved}
           gridWidth={smallGridWidth}
-        ></Piece>
+        />
       );
     });
 
