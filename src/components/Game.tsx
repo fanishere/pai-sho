@@ -1,11 +1,11 @@
 import React from 'react';
 import { Circle, Group, Layer, Rect, Stage } from 'react-konva';
-import { Piece, PieceProps } from './Piece';
+import { Piece, PieceProps } from './Piece/Piece';
 import { PieceDataList, PieceGuide } from './types';
 import Konva from 'konva';
 import Gate from './Gate';
 import Garden from './Garden';
-import { FlowerPiece } from './ThreeSpaceFlower';
+import { JadePiece, JasminePiece, RosePiece } from './Piece/FlowerPiece';
 
 type GameProps = {
   width: number;
@@ -34,14 +34,14 @@ class Game extends React.Component<GameProps, GameState> {
       }
     };
   }
-  handlePieceMoving(piece: Piece<PieceProps>): void {
+  handlePieceMoving(piece: Piece): void {
     // get guide positions that apply to this piece [will use original piece position]
     const guides = piece.getGuides();
     this.setState({
       guidesVisible: guides
     });
   }
-  handlePieceMoved = (piece: Piece<PieceProps>): void => {
+  handlePieceMoved = (piece: Piece): void => {
     const guides = piece.getGuides();
     if (guides.length < 1) {
       return;
@@ -92,8 +92,8 @@ class Game extends React.Component<GameProps, GameState> {
     const pieces = Object.keys(this.state.piecePositions).map((key) => {
       const p = this.state.piecePositions[key];
       return (
-        <FlowerPiece
-          spaces={3}
+        <RosePiece
+          side={'red'}
           key={key}
           name={key}
           position={p.position}
