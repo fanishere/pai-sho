@@ -44,9 +44,6 @@ export class FlowerPiece extends Piece {
             y: this.props.position.y + this.props.gridWidth * j
           });
         }
-
-        if (j !== 0) {
-        }
       }
     }
 
