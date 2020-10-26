@@ -1,11 +1,11 @@
 import React from 'react';
 import { Circle, Group, Layer, Rect, Stage } from 'react-konva';
-import { Piece, PieceProps } from './Piece/Piece';
+import { Piece } from './Piece/Piece';
 import { PieceDataList, PieceGuide } from './types';
 import Konva from 'konva';
 import Gate from './Gate';
 import Garden from './Garden';
-import { JadePiece, JasminePiece, RosePiece } from './Piece/FlowerPiece';
+import { Rose } from './Piece/Flower';
 
 type GameProps = {
   width: number;
@@ -92,7 +92,7 @@ class Game extends React.Component<GameProps, GameState> {
     const pieces = Object.keys(this.state.piecePositions).map((key) => {
       const p = this.state.piecePositions[key];
       return (
-        <RosePiece
+        <Rose
           side={'red'}
           key={key}
           name={key}

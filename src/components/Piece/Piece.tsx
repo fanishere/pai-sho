@@ -3,13 +3,7 @@ import lily from '../../assets/Lily_final.svg';
 import { Image } from 'react-konva';
 import { debounce } from 'underscore';
 import Konva from 'konva';
-import {
-  PieceGuide,
-  PieceGuideCandidates,
-  Position,
-  PieceData,
-  Side
-} from '../types';
+import { PieceGuide, Position, PieceData, Side } from '../types';
 
 export interface PieceProps {
   position: Position;

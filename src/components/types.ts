@@ -11,11 +11,6 @@ export interface PieceDataList {
   [index: string]: PieceData;
 }
 
-export type PieceGuideCandidates = {
-  position: Position;
-  offset: number;
-};
-
 export type PieceGuide = {
   position: Position;
   offset: number;
