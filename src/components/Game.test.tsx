@@ -4,7 +4,7 @@ import { mount, ReactWrapper, shallow, ShallowWrapper } from 'enzyme';
 import Game from './Game';
 import toJson from 'enzyme-to-json';
 import 'jest-canvas-mock';
-import { Piece } from './Piece';
+import { Piece } from './Piece/Piece';
 import { PieceGuide } from './types';
 
 describe('Mounted tests', () => {

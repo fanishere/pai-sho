@@ -11,14 +11,9 @@ export interface PieceDataList {
   [index: string]: PieceData;
 }
 
-export type PieceGuideCandidates = {
-  position: Position;
-  xDiff: number;
-  yDiff: number;
-  offset: number;
-};
-
 export type PieceGuide = {
   position: Position;
   offset: number;
 };
+
+export type Side = 'red' | 'white';
