@@ -17,6 +17,9 @@ export class Flower extends Piece {
   }
   getSnapLines = (): Position[] => {
     const lines: Position[] = [];
+    if (this.props.position === undefined) {
+      return lines;
+    }
     for (let i = 0; i <= this.spaces; i++) {
       for (let j = 0; j <= this.spaces; j++) {
         if (i === 0 && j === 0) {

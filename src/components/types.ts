@@ -4,7 +4,7 @@ export type Position = {
 };
 
 export type PieceData = {
-  position: Position;
+  position: Position | null;
 };
 
 export interface PieceDataList {

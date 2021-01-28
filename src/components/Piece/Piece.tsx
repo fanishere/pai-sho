@@ -6,7 +6,7 @@ import Konva from 'konva';
 import { PieceGuide, Position, PieceData, Side } from '../types';
 
 export interface PieceProps {
-  position: Position;
+  position?: Position;
   name: string;
   gridWidth: number;
   side: Side;
@@ -30,7 +30,7 @@ export class Piece
     this.handleChange = debounce(this.handleChange.bind(this), 25, true);
     this.handleMove = this.handleMove.bind(this);
     this.state = {
-      position: this.props.position
+      position: null
     };
   }
   getSnapLines = (): Position[] => {
@@ -39,6 +39,10 @@ export class Piece
 
   getGuides = (): PieceGuide[] => {
     const candidates: PieceGuide[] = [];
+
+    if (this.props.position === undefined) {
+      console.log('sdfsfs');
+    }
 
     const snapPositions = this.getSnapLines();
     snapPositions.forEach((pos) => {
@@ -66,7 +70,7 @@ export class Piece
   handleMove = (): void => {
     this.props.onDragEnd(this);
 
-    if (this.imageRef.current) {
+    if (this.imageRef.current && this.props.position) {
       this.imageRef.current.setPosition(this.props.position);
     }
   };
@@ -75,14 +79,21 @@ export class Piece
     const img = document.createElement('img');
     img.src = lily;
 
+    let x = 300;
+    let y = 0;
+    if (this.state.position) {
+      x = this.state.position.x;
+      y = this.state.position.y;
+    }
+
     return (
       <Image
         ref={this.imageRef}
         offset={{ x: 15, y: 15 }}
         onDragMove={this.handleChange}
         onDragEnd={this.handleMove}
-        x={this.state.position.x}
-        y={this.state.position.y}
+        x={x}
+        y={y}
         image={this.image}
         width={30}
         height={30}

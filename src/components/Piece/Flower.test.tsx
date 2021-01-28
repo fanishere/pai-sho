@@ -97,7 +97,7 @@ describe('Test Rose/Jasmine', () => {
 
     it('renders with the props set', () => {
       for (let i = 0; i < pieces.length; i++) {
-        let piece = pieces[i];
+        const piece = pieces[i];
         expect(piece?.props.gridWidth).toEqual(20);
         expect(piece?.props.position).toEqual({ x: 1, y: 0 });
         expect(piece?.props.name).toEqual('test_piece');
@@ -108,7 +108,7 @@ describe('Test Rose/Jasmine', () => {
   describe('Test getGuides', () => {
     it('getSnapLines gets box of 48 positions', () => {
       for (let i = 0; i < pieces.length; i++) {
-        let piece = pieces[i];
+        const piece = pieces[i];
         const snapLines = piece?.getSnapLines();
         const expectedSnapLines = [
           { x: 1, y: -20 },
@@ -167,7 +167,7 @@ describe('Test Rose/Jasmine', () => {
 
     it('getGuides gets box of 48 positions sorted with offsets', () => {
       for (let i = 0; i < pieces.length; i++) {
-        let piece = pieces[i];
+        const piece = pieces[i];
 
         const guides = piece?.getGuides();
         expect(guides?.length).toEqual(48);
@@ -269,7 +269,7 @@ describe('Test Chrysanthemum/Lily', () => {
 
     it('renders with the props set', () => {
       for (let i = 0; i < pieces.length; i++) {
-        let piece = pieces[i];
+        const piece = pieces[i];
         expect(piece?.props.gridWidth).toEqual(20);
         expect(piece?.props.position).toEqual({ x: 1, y: 0 });
         expect(piece?.props.name).toEqual('test_piece');
@@ -280,7 +280,7 @@ describe('Test Chrysanthemum/Lily', () => {
   describe('Test getGuides', () => {
     it('getSnapLines gets box of 80 positions', () => {
       for (let i = 0; i < pieces.length; i++) {
-        let piece = pieces[i];
+        const piece = pieces[i];
         const snapLines = piece?.getSnapLines();
         const expectedSnapLines = [
           { x: 1, y: -20 },
@@ -371,7 +371,7 @@ describe('Test Chrysanthemum/Lily', () => {
 
     it('getGuides gets box of 80 positions sorted with offsets', () => {
       for (let i = 0; i < pieces.length; i++) {
-        let piece = pieces[i];
+        const piece = pieces[i];
 
         const guides = piece?.getGuides();
         expect(guides?.length).toEqual(80);
@@ -473,7 +473,7 @@ describe('Test Rhododendron/Jade', () => {
 
     it('renders with the props set', () => {
       for (let i = 0; i < pieces.length; i++) {
-        let piece = pieces[i];
+        const piece = pieces[i];
         expect(piece?.props.gridWidth).toEqual(20);
         expect(piece?.props.position).toEqual({ x: 1, y: 0 });
         expect(piece?.props.name).toEqual('test_piece');
@@ -484,7 +484,7 @@ describe('Test Rhododendron/Jade', () => {
   describe('Test getGuides', () => {
     it('getSnapLines gets box of 120 positions', () => {
       for (let i = 0; i < pieces.length; i++) {
-        let piece = pieces[i];
+        const piece = pieces[i];
         const snapLines = piece?.getSnapLines();
         const expectedSnapLines = [
           { x: 1, y: -20 },
@@ -615,7 +615,7 @@ describe('Test Rhododendron/Jade', () => {
 
     it('getGuides gets box of 80 positions sorted with offsets', () => {
       for (let i = 0; i < pieces.length; i++) {
-        let piece = pieces[i];
+        const piece = pieces[i];
 
         const guides = piece?.getGuides();
         expect(guides?.length).toEqual(120);

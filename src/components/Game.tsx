@@ -6,6 +6,7 @@ import Konva from 'konva';
 import Gate from './Gate';
 import Garden from './Garden';
 import { Rose } from './Piece/Flower';
+import { PieceSelection } from './PieceSelection';
 
 type GameProps = {
   width: number;
@@ -30,7 +31,8 @@ class Game extends React.Component<GameProps, GameState> {
     this.state = {
       guidesVisible: [],
       piecePositions: {
-        first: { position: { x: 0, y: 0 } }
+        rose: { position: null },
+        second: { position: null }
       }
     };
   }
@@ -89,20 +91,21 @@ class Game extends React.Component<GameProps, GameState> {
             };
           });
       });
-    const pieces = Object.keys(this.state.piecePositions).map((key) => {
-      const p = this.state.piecePositions[key];
-      return (
-        <Rose
-          side={'red'}
-          key={key}
-          name={key}
-          position={p.position}
-          onDragMove={this.handlePieceMoving}
-          onDragEnd={this.handlePieceMoved}
-          gridWidth={smallGridWidth}
-        />
-      );
-    });
+    const pieces: JSX.Element[] = Object.keys(this.state.piecePositions).map(
+      (key) => {
+        const p = this.state.piecePositions[key];
+        return (
+          <Rose
+            side={'red'}
+            key={key}
+            name={key}
+            onDragMove={this.handlePieceMoving}
+            onDragEnd={this.handlePieceMoved}
+            gridWidth={smallGridWidth}
+          />
+        );
+      }
+    );
 
     return (
       <Stage width={window.innerWidth} height={window.innerHeight}>
@@ -198,9 +201,9 @@ class Game extends React.Component<GameProps, GameState> {
               vertex2={[0, this.props.radius - smallGridWidth * 2]}
               fill={'red'}
             ></Garden>
-            {pieces}
           </Group>
         </Layer>
+        <PieceSelection pieces={pieces} />
       </Stage>
     );
   }
