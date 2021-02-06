@@ -1,212 +1,175 @@
-import React from 'react';
+import React, { FunctionComponent, ReactElement } from 'react';
 import { Circle, Group, Layer, Rect, Stage } from 'react-konva';
 import { Piece } from './Piece/Piece';
-import { PieceDataList, PieceGuide } from './types';
 import Konva from 'konva';
 import Gate from './Gate';
 import Garden from './Garden';
-import { Rose } from './Piece/Flower';
-import { PieceSelection } from './PieceSelection';
+import PieceSelection from './PieceSelection';
+import { useSelector, ReactReduxContext, Provider } from 'react-redux';
+import { guidesSelector, piecesSelector } from '../store/selectors';
+import rose from '../assets/rose.svg';
 
-type GameProps = {
+export type GameProps = {
   width: number;
   height: number;
   radius: number;
   gridCount: number;
 };
 
-type GameState = {
-  guidesVisible: PieceGuide[];
-  piecePositions: PieceDataList;
-};
-
-class Game extends React.Component<GameProps, GameState> {
-  private layerRef: React.RefObject<Konva.Layer> | null | undefined;
-  constructor(props: GameProps) {
-    super(props);
-
-    this.layerRef = React.createRef();
-    this.handlePieceMoving = this.handlePieceMoving.bind(this);
-    this.handlePieceMoved = this.handlePieceMoved.bind(this);
-    this.state = {
-      guidesVisible: [],
-      piecePositions: {
-        rose: { position: null },
-        second: { position: null }
-      }
-    };
-  }
-  handlePieceMoving(piece: Piece): void {
-    // get guide positions that apply to this piece [will use original piece position]
-    const guides = piece.getGuides();
-    this.setState({
-      guidesVisible: guides
-    });
-  }
-  handlePieceMoved = (piece: Piece): void => {
-    const guides = piece.getGuides();
-    if (guides.length < 1) {
-      return;
-    }
-
-    const guide = guides[0];
-    let snapPosition = guide.position;
-    // offset is too large so snap to original position
-    if (guide.offset > 15) {
-      snapPosition = { x: 0, y: 0 };
-    }
-    const piecePositions = this.state.piecePositions;
-    piecePositions[piece.props.name] = { position: snapPosition };
-    this.setState({
-      piecePositions: piecePositions,
-      guidesVisible: []
-    });
-  };
-  isInsideGameBoard = (
-    x1: number,
-    x2: number,
-    y1: number,
-    y2: number
-  ): boolean => {
-    return (
-      Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) >=
-      this.props.radius * this.props.radius
-    );
-  };
-  clipFunc = (ctx: CanvasRenderingContext2D): void => {
+const Game: FunctionComponent<GameProps> = (props: GameProps) => {
+  const guidesVisible = useSelector(guidesSelector);
+  // const isInsideGameBoard = (
+  //   x1: number,
+  //   x2: number,
+  //   y1: number,
+  //   y2: number
+  // ): boolean => {
+  //   return (
+  //     Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) >= props.radius * props.radius
+  //   );
+  // };
+  const clipFunc = (ctx: CanvasRenderingContext2D): void => {
     // clip a full circle of this.props.radius
-    ctx.arc(0, 0, this.props.radius, 0, Math.PI * 2);
+    ctx.arc(0, 0, props.radius, 0, Math.PI * 2);
   };
-  render(): React.ReactNode {
-    const smallGridWidth = this.props.radius / (this.props.gridCount / 2);
-    const vertices: { x: number; y: number }[][] = Array(this.props.gridCount)
-      .fill('')
-      .map((_, i: number) => {
-        return Array(this.props.gridCount)
-          .fill('')
-          .map((_, j) => {
-            return {
-              x: smallGridWidth * i - this.props.radius,
-              y: smallGridWidth * j - this.props.radius
-            };
-          });
-      });
-    const pieces: JSX.Element[] = Object.keys(this.state.piecePositions).map(
-      (key) => {
-        const p = this.state.piecePositions[key];
-        return (
-          <Rose
-            side={'red'}
-            key={key}
-            name={key}
-            onDragMove={this.handlePieceMoving}
-            onDragEnd={this.handlePieceMoved}
-            gridWidth={smallGridWidth}
-          />
-        );
-      }
-    );
+  const layerRef:
+    | React.RefObject<Konva.Layer>
+    | null
+    | undefined = React.createRef();
+  const pieces = useSelector(piecesSelector);
 
+  const smallGridWidth = props.radius / (props.gridCount / 2);
+  const vertices: { x: number; y: number }[][] = Array(props.gridCount)
+    .fill('')
+    .map((_, i: number) => {
+      return Array(props.gridCount)
+        .fill('')
+        .map((_, j) => {
+          return {
+            x: smallGridWidth * i - props.radius,
+            y: smallGridWidth * j - props.radius
+          };
+        });
+    });
+  const boardPieces = pieces.map((piece) => {
     return (
-      <Stage width={window.innerWidth} height={window.innerHeight}>
-        <Layer
-          offsetX={-this.props.radius}
-          offsetY={-this.props.radius}
-          ref={this.layerRef}
-        >
-          <Group clipFunc={this.clipFunc}>
-            <Circle x={0} y={0} radius={this.props.radius} fill="pink"></Circle>
-
-            {/*grids*/}
-            {vertices.map((vertex, i) => {
-              return vertex.map((v, j) => {
-                return (
-                  <Rect
-                    // TODO make this key unique
-                    key={i + j}
-                    x={v.x}
-                    y={v.y}
-                    width={smallGridWidth}
-                    height={smallGridWidth}
-                    stroke="white"
-                  />
-                );
-              });
-            })}
-
-            {/*guides*/}
-            {this.state.guidesVisible.map((guide, i) => {
-              return (
-                <Circle
-                  // TODO make this key unique
-                  key={i}
-                  x={guide.position.x}
-                  y={guide.position.y}
-                  stroke="white"
-                  fill={'red'}
-                  radius={5}
-                />
-              );
-            })}
-
-            <Gate
-              x={smallGridWidth * 2 - this.props.radius}
-              y={0}
-              gridWidth={smallGridWidth}
-              gameRadius={this.props.width}
-              rotation={90}
-            ></Gate>
-            <Gate
-              x={0}
-              y={this.props.radius - smallGridWidth * 2}
-              gridWidth={smallGridWidth}
-              gameRadius={this.props.width}
-              rotation={0}
-            ></Gate>
-            <Gate
-              x={0}
-              y={smallGridWidth * 2 - this.props.radius}
-              gridWidth={smallGridWidth}
-              gameRadius={this.props.width}
-              rotation={180}
-            ></Gate>
-            <Gate
-              x={this.props.radius - smallGridWidth * 2}
-              y={0}
-              gridWidth={smallGridWidth}
-              gameRadius={this.props.width}
-              rotation={270}
-            ></Gate>
-            <Garden
-              middle={[0, 0]}
-              vertex1={[smallGridWidth * 2 - this.props.radius, 0]}
-              vertex2={[0, smallGridWidth * 2 - this.props.radius]}
-              fill={'#fef3ed'}
-            ></Garden>
-            <Garden
-              middle={[0, 0]}
-              vertex1={[this.props.radius - smallGridWidth * 2, 0]}
-              vertex2={[0, smallGridWidth * 2 - this.props.radius]}
-              fill={'red'}
-            ></Garden>
-            <Garden
-              middle={[0, 0]}
-              vertex1={[this.props.radius - smallGridWidth * 2, 0]}
-              vertex2={[0, this.props.radius - smallGridWidth * 2]}
-              fill={'#fef3ed'}
-            ></Garden>
-            <Garden
-              middle={[0, 0]}
-              vertex1={[smallGridWidth * 2 - this.props.radius, 0]}
-              vertex2={[0, this.props.radius - smallGridWidth * 2]}
-              fill={'red'}
-            ></Garden>
-          </Group>
-        </Layer>
-        <PieceSelection pieces={pieces} />
-      </Stage>
+      <Piece
+        key={piece.name}
+        name={piece.name}
+        gridWidth={smallGridWidth}
+        side={'red'}
+        imgSrc={rose}
+        spaces={3}
+        position={piece.position}
+      />
     );
-  }
-}
+  });
+
+  return (
+    <ReactReduxContext.Consumer>
+      {({ store }): ReactElement => (
+        <Stage width={window.innerWidth} height={window.innerHeight}>
+          <Provider store={store}>
+            <Layer
+              offsetX={-props.radius}
+              offsetY={-props.radius}
+              ref={layerRef}
+            >
+              <Group clipFunc={clipFunc}>
+                <Circle x={0} y={0} radius={props.radius} fill="pink"></Circle>
+
+                {/*grids*/}
+                {vertices.map((vertex, i) => {
+                  return vertex.map((v, j) => {
+                    return (
+                      <Rect
+                        // TODO make this key unique
+                        key={i + j}
+                        x={v.x}
+                        y={v.y}
+                        width={smallGridWidth}
+                        height={smallGridWidth}
+                        stroke="white"
+                      />
+                    );
+                  });
+                })}
+
+                {/*guides*/}
+                {guidesVisible.map((guide, i) => {
+                  return (
+                    <Circle
+                      // TODO make this key unique
+                      key={i}
+                      x={guide.position.x}
+                      y={guide.position.y}
+                      stroke="white"
+                      fill={'red'}
+                      radius={5}
+                    />
+                  );
+                })}
+
+                <Gate
+                  x={smallGridWidth * 2 - props.radius}
+                  y={0}
+                  gridWidth={smallGridWidth}
+                  gameRadius={props.width}
+                  rotation={90}
+                ></Gate>
+                <Gate
+                  x={0}
+                  y={props.radius - smallGridWidth * 2}
+                  gridWidth={smallGridWidth}
+                  gameRadius={props.width}
+                  rotation={0}
+                ></Gate>
+                <Gate
+                  x={0}
+                  y={smallGridWidth * 2 - props.radius}
+                  gridWidth={smallGridWidth}
+                  gameRadius={props.width}
+                  rotation={180}
+                ></Gate>
+                <Gate
+                  x={props.radius - smallGridWidth * 2}
+                  y={0}
+                  gridWidth={smallGridWidth}
+                  gameRadius={props.width}
+                  rotation={270}
+                ></Gate>
+                <Garden
+                  middle={[0, 0]}
+                  vertex1={[smallGridWidth * 2 - props.radius, 0]}
+                  vertex2={[0, smallGridWidth * 2 - props.radius]}
+                  fill={'#fef3ed'}
+                ></Garden>
+                <Garden
+                  middle={[0, 0]}
+                  vertex1={[props.radius - smallGridWidth * 2, 0]}
+                  vertex2={[0, smallGridWidth * 2 - props.radius]}
+                  fill={'red'}
+                ></Garden>
+                <Garden
+                  middle={[0, 0]}
+                  vertex1={[props.radius - smallGridWidth * 2, 0]}
+                  vertex2={[0, props.radius - smallGridWidth * 2]}
+                  fill={'#fef3ed'}
+                ></Garden>
+                <Garden
+                  middle={[0, 0]}
+                  vertex1={[smallGridWidth * 2 - props.radius, 0]}
+                  vertex2={[0, props.radius - smallGridWidth * 2]}
+                  fill={'red'}
+                ></Garden>
+              </Group>
+            </Layer>
+            <PieceSelection pieces={boardPieces} />
+          </Provider>
+        </Stage>
+      )}
+    </ReactReduxContext.Consumer>
+  );
+};
 
 export default Game;

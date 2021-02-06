@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import { Line } from 'react-konva';
 
 type GardenProps = {
@@ -8,7 +8,7 @@ type GardenProps = {
   fill: string;
 };
 
-function Garden(props: GardenProps): React.ReactElement {
+const Garden: FunctionComponent<GardenProps> = (props: GardenProps) => {
   return (
     <Line
       points={[
@@ -24,6 +24,6 @@ function Garden(props: GardenProps): React.ReactElement {
       closed={true}
     ></Line>
   );
-}
+};
 
 export default Garden;

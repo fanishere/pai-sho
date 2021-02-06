@@ -1,196 +1,48 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as React from 'react';
-import { mount, ReactWrapper, shallow, ShallowWrapper } from 'enzyme';
-import Game from './Game';
+import { mount, ReactWrapper } from 'enzyme';
+import Game, { GameProps } from './Game';
 import toJson from 'enzyme-to-json';
 import 'jest-canvas-mock';
-import { Piece } from './Piece/Piece';
-import { PieceGuide } from './types';
+import configureStore from 'redux-mock-store';
+import { Provider } from 'react-redux';
+import { GameState } from '../store/types';
 
 describe('Mounted tests', () => {
-  let instance: App;
   let wrapper: ReactWrapper;
-  class App extends React.Component {
-    game: Game | null | undefined;
-
-    render(): React.ReactNode {
-      return (
-        <Game
-          height={300}
-          width={300}
-          radius={300}
-          gridCount={18}
-          ref={(node): Game | null => (this.game = node)}
-        />
-      );
-    }
-  }
+  let game: ReactWrapper<GameProps>;
+  const initialGameState: GameState = {
+    piecePositions: [],
+    guidesVisible: []
+  };
 
   beforeEach(() => {
-    wrapper = mount(<App />);
-    instance = wrapper.instance() as App;
+    const middlewares: any = [];
+    const mockStore = configureStore(middlewares);
+    const store = mockStore(initialGameState);
+
+    wrapper = mount(
+      <Provider store={store}>
+        <Game height={300} width={300} radius={300} gridCount={18} />
+      </Provider>
+    );
+    game = wrapper.find(Game);
   });
 
   describe('Test render', () => {
     it('renders Game with props', () => {
+      expect(game).toHaveLength(1);
       expect(toJson(wrapper)).toMatchSnapshot();
     });
 
     it('renders with the props set', () => {
-      const game = instance.game;
-      expect(game?.props.height).toEqual(300);
-      expect(game?.props.width).toEqual(300);
-      expect(game?.props.radius).toEqual(300);
-      expect(game?.props.gridCount).toEqual(18);
+      expect(game.props().height).toEqual(300);
+      expect(game.props().width).toEqual(300);
+      expect(game.props().radius).toEqual(300);
+      expect(game.props().gridCount).toEqual(18);
     });
 
-    it('renders with the default state', () => {
-      const game = instance.game;
-      expect(game?.state.guidesVisible).toEqual([]);
-      expect(game?.state.piecePositions).toEqual({
-        first: { position: { x: 0, y: 0 } }
-      });
-    });
-  });
-
-  describe('Test clipFunc', () => {
-    let game: Game | null | undefined;
-    let ctx: CanvasRenderingContext2D | null;
-
-    beforeEach(() => {
-      game = instance.game;
-      ctx = document.createElement('canvas').getContext('2d');
-    });
-
-    it('does not error', () => {
-      expect(() => game?.clipFunc(ctx!)).not.toThrow();
-    });
-
-    it('snapshot path', () => {
-      game?.clipFunc(ctx!);
-
-      const path = ctx?.__getPath();
-      expect(path).toMatchSnapshot();
-    });
-
-    it('snapshot clipping region', () => {
-      game?.clipFunc(ctx!);
-      const region = ctx?.__getClippingRegion();
-      expect(region).toMatchSnapshot();
-    });
-  });
-});
-
-describe('Shallow tests', () => {
-  let game: Game;
-  let wrapper: ShallowWrapper;
-  let piece: Piece;
-
-  beforeEach(() => {
-    wrapper = shallow(
-      <Game height={300} width={300} radius={300} gridCount={18} />
-    );
-    game = wrapper.instance() as Game;
-
-    const pieceWrapper = shallow(
-      <Piece
-        key={0}
-        name={'test piece'}
-        position={{ x: 0, y: 0 }}
-        onDragMove={jest.fn()}
-        onDragEnd={jest.fn()}
-        gridWidth={15}
-      />
-    );
-    piece = pieceWrapper.instance() as Piece;
-  });
-
-  describe('Test handlePieceMoving', () => {
-    it('0 guides returned', () => {
-      const guides: PieceGuide[] = [];
-      piece.getGuides = jest.fn().mockReturnValue(guides);
-      game.handlePieceMoving(piece);
-      expect(game?.state.guidesVisible).toEqual(guides);
-    });
-    it('one guide returned', () => {
-      const guides = [
-        {
-          position: { x: 0, y: 0 },
-          offset: 10
-        }
-      ];
-      piece.getGuides = jest.fn().mockReturnValue(guides);
-      game.handlePieceMoving(piece);
-      expect(game?.state.guidesVisible).toEqual(guides);
-    });
-    it('three guides returned', () => {
-      const guides = [
-        {
-          position: { x: 0, y: 0 },
-          offset: 10
-        },
-        {
-          position: { x: 0, y: 30 },
-          offset: 10
-        },
-        {
-          position: { x: 30, y: 60 },
-          offset: 10
-        }
-      ];
-      piece.getGuides = jest.fn().mockReturnValue(guides);
-      game.handlePieceMoving(piece);
-      expect(game?.state.guidesVisible).toEqual(guides);
-    });
-  });
-
-  describe('Test handlePieceMoved', () => {
-    it('0 guides returned', () => {
-      const guides: PieceGuide[] = [];
-      piece.getGuides = jest.fn().mockReturnValue(guides);
-      expect(() => game.handlePieceMoved(piece)).not.toThrow();
-      expect(game.state.guidesVisible).toEqual([]);
-      expect(game.state.piecePositions).toEqual({
-        first: { position: { x: 0, y: 0 } }
-      });
-    });
-    it('one guide returned', () => {
-      const guides: PieceGuide[] = [
-        {
-          position: { x: 20, y: 20 },
-          offset: 10
-        }
-      ];
-      piece.getGuides = jest.fn().mockReturnValue(guides);
-      expect(() => game.handlePieceMoved(piece)).not.toThrow();
-      expect(game.state.guidesVisible).toEqual([]);
-      expect(game.state.piecePositions).toEqual({
-        first: { position: { x: 0, y: 0 } },
-        'test piece': { position: { x: 20, y: 20 } }
-      });
-    });
-    it('three guide returned', () => {
-      const guides: PieceGuide[] = [
-        {
-          position: { x: 20, y: 20 },
-          offset: 10
-        },
-        {
-          position: { x: 40, y: 40 },
-          offset: 30
-        },
-        {
-          position: { x: 60, y: 60 },
-          offset: 50
-        }
-      ];
-      piece.getGuides = jest.fn().mockReturnValue(guides);
-      expect(() => game.handlePieceMoved(piece)).not.toThrow();
-      expect(game.state.guidesVisible).toEqual([]);
-      expect(game.state.piecePositions).toEqual({
-        first: { position: { x: 0, y: 0 } },
-        'test piece': { position: { x: 20, y: 20 } }
-      });
+    it('renders with 0 guides showing', () => {
+      expect(game).toHaveLength(1);
     });
   });
 });

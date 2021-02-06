@@ -1,10 +1,15 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from './index';
+import { GameState, PieceData, PieceGuide } from './types';
 
-const piecesSelector = (state: RootState) => state.pieces;
+export const piecesSelector = (state: GameState): PieceData[] => {
+  return state.piecePositions;
+};
 
 export const pieceMapSelector = createSelector(
   piecesSelector,
-  (pieces) =>
-    new Map(pieces.piecePositions.map((piece) => [piece.name, piece.position]))
+  (pieces) => new Map(pieces.map((piece) => [piece.name, piece.position]))
 );
+
+export const guidesSelector = (state: GameState): PieceGuide[] => {
+  return state.guidesVisible;
+};

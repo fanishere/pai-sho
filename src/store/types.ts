@@ -8,16 +8,36 @@ export interface PieceData {
   position: Position | null;
 }
 
+export type PieceGuide = {
+  position: Position;
+  offset: number;
+};
+
 export interface GameState {
   piecePositions: PieceData[];
+  guidesVisible: PieceGuide[];
 }
 
-export const MOVE_PIECE = 'PIECE_MOVE';
+export const MOVE_PIECE = 'MOVE_PIECE';
+export const SET_GUIDES = 'SET_GUIDES';
+export const REMOVE_GUIDES = 'REMOVE_GUIDES';
 
-interface PieceMoveAction {
+export interface PieceMoveAction {
   type: typeof MOVE_PIECE;
   pieceName: string;
   position: Position;
 }
 
-export type GameActionTypes = PieceMoveAction;
+export interface SetGuidesAction {
+  type: typeof SET_GUIDES;
+  guides: PieceGuide[];
+}
+
+export interface RemoveGuidesAction {
+  type: typeof REMOVE_GUIDES;
+}
+
+export type GameActionTypes =
+  | PieceMoveAction
+  | SetGuidesAction
+  | RemoveGuidesAction;

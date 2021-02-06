@@ -1,54 +1,97 @@
-import React from 'react';
-import lily from '../../assets/Lily_final.svg';
+import React, { FunctionComponent, RefObject } from 'react';
+
 import { Image } from 'react-konva';
 import { debounce } from 'underscore';
+import { PieceGuide, Position, Side } from '../types';
+import { useDispatch } from 'react-redux';
+import { movePiece, removeGuides, setGuides } from '../../store/actions';
+import useImage from 'use-image';
 import Konva from 'konva';
-import { PieceGuide, Position, PieceData, Side } from '../types';
 
 export interface PieceProps {
-  position?: Position;
+  position: Position | null;
   name: string;
   gridWidth: number;
   side: Side;
-  onDragMove: (p: Piece) => void;
-  onDragEnd: (p: Piece) => void;
+  imgSrc: string;
+  spaces: number;
 }
 
-interface PieceInt {
-  getSnapLines: () => Position[];
-}
+export const Piece: FunctionComponent<PieceProps> = (props: PieceProps) => {
+  const dispatch = useDispatch();
 
-export class Piece
-  extends React.Component<PieceProps, PieceData>
-  implements PieceInt {
-  readonly imageRef: React.RefObject<Konva.Image>;
-  image: HTMLImageElement | undefined;
-  constructor(props: PieceProps) {
-    super(props);
+  const imageRef: RefObject<Konva.Image> | null | undefined = React.createRef();
+  const getSnapLines = (): Position[] => {
+    const lines: Position[] = [];
+    if (imageRef.current === null) {
+      return lines;
+    }
+    const currentPosition = imageRef.current.getPosition();
+    console.log(currentPosition);
+    if (props.position === null) {
+      const starterLines = [
+        {
+          x: 0,
+          y: -300
+        },
+        {
+          x: 300,
+          y: 0
+        },
+        {
+          x: 0,
+          y: 300
+        },
+        {
+          x: -300,
+          y: 0
+        }
+      ];
+      return starterLines;
+    }
+    for (let i = 0; i <= props.spaces; i++) {
+      for (let j = 0; j <= props.spaces; j++) {
+        if (i === 0 && j === 0) {
+          continue;
+        }
 
-    this.imageRef = React.createRef();
-    this.handleChange = debounce(this.handleChange.bind(this), 25, true);
-    this.handleMove = this.handleMove.bind(this);
-    this.state = {
-      position: null
-    };
-  }
-  getSnapLines = (): Position[] => {
-    throw new Error('You forgot to override me!');
+        lines.push({
+          x: props.position.x - props.gridWidth * i,
+          y: props.position.y - props.gridWidth * j
+        });
+        lines.push({
+          x: props.position.x + props.gridWidth * i,
+          y: props.position.y + props.gridWidth * j
+        });
+
+        if (i !== 0 && j !== 0) {
+          lines.push({
+            x: props.position.x + props.gridWidth * i,
+            y: props.position.y - props.gridWidth * j
+          });
+
+          lines.push({
+            x: props.position.x - props.gridWidth * i,
+            y: props.position.y + props.gridWidth * j
+          });
+        }
+      }
+    }
+
+    return lines;
   };
-
-  getGuides = (): PieceGuide[] => {
+  const getGuides = (): PieceGuide[] => {
     const candidates: PieceGuide[] = [];
 
-    if (this.props.position === undefined) {
+    if (props.position === undefined) {
       console.log('sdfsfs');
     }
 
-    const snapPositions = this.getSnapLines();
+    const snapPositions = getSnapLines();
     snapPositions.forEach((pos) => {
-      if (this.imageRef.current) {
+      if (imageRef.current) {
         // TODO check current position is dynamic
-        const currentPosition = this.imageRef.current.getPosition();
+        const currentPosition = imageRef.current.getPosition();
         const xDiff = Math.abs(pos.x - currentPosition.x);
         const yDiff = Math.abs(pos.y - currentPosition.y);
 
@@ -64,42 +107,56 @@ export class Piece
       return a.offset - b.offset;
     });
   };
-  handleChange = (): void => {
-    this.props.onDragMove(this);
+
+  const handleChange = (): void => {
+    const guides = getGuides();
+    dispatch(setGuides(guides));
   };
-  handleMove = (): void => {
-    this.props.onDragEnd(this);
-
-    if (this.imageRef.current && this.props.position) {
-      this.imageRef.current.setPosition(this.props.position);
-    }
-  };
-
-  render(): React.ReactNode {
-    const img = document.createElement('img');
-    img.src = lily;
-
-    let x = 300;
-    let y = 0;
-    if (this.state.position) {
-      x = this.state.position.x;
-      y = this.state.position.y;
+  const handleMove = (): void => {
+    const guides = getGuides();
+    if (guides.length < 1) {
+      return;
     }
 
-    return (
-      <Image
-        ref={this.imageRef}
-        offset={{ x: 15, y: 15 }}
-        onDragMove={this.handleChange}
-        onDragEnd={this.handleMove}
-        x={x}
-        y={y}
-        image={this.image}
-        width={30}
-        height={30}
-        draggable={true}
-        stroke={this.props.side}
-      />
-    );
+    const guide = guides[0];
+    let snapPosition = guide.position;
+    // offset is too large so snap to original position
+    if (guide.offset > 15 && props.position) {
+      snapPosition = props.position;
+    }
+
+    dispatch(movePiece(props.name, snapPosition));
+
+    if (imageRef.current && props.position) {
+      imageRef.current.setPosition(props.position);
+    }
+    dispatch(removeGuides);
+  };
+
+  const image = document.createElement('img');
+  image.src = props.imgSrc;
+  const [newImg] = useImage(props.imgSrc);
+
+  let x = 300;
+  let y = 0;
+  if (props.position != undefined) {
+    x = props.position.x;
+    y = props.position.y;
   }
-}
+
+  return (
+    <Image
+      image={newImg}
+      ref={imageRef}
+      offset={{ x: 15, y: 15 }}
+      onDragMove={debounce(handleChange, 25, true)}
+      onDragEnd={handleMove}
+      x={x}
+      y={y}
+      width={30}
+      height={30}
+      draggable={true}
+      stroke={props.side}
+    ></Image>
+  );
+};
